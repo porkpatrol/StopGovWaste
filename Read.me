@@ -1,0 +1,57 @@
+# main.py
+# Basic structure for sending polite messages to Congress
+
+print("This is a placeholder for the StopGovWaste script.")
+print("Next steps: add logic to generate messages and send them via email/API.")
+import requests
+import json
+
+# Instructions:
+# 1. Obtain a free ProPublica Congress API key at: https://www.propublica.org/datastore/api/propublica-congress-api
+# 2. Run this script locally (requires Python 3 and the 'requests' library: pip install requests)
+# 3. It will guide you through input and output formatted messages with contact links.
+
+API_KEY = "YOUR_API_KEY_HERE"  # Replace with your actual key
+
+def get_current_congress_members():
+    url = "https://api.propublica.org/congress/v1/118/members/house.json"  # 118th Congress House (update if needed)
+    headers = {"X-API-Key": API_KEY}
+    house_response = requests.get(url, headers=headers)
+    house_members = house_response.json()["results"][0]["members"]
+    
+    url_senate = "https://api.propublica.org/congress/v1/118/members/senate.json"
+    senate_response = requests.get(url_senate, headers=headers)
+    senate_members = senate_response.json()["results"][0]["members"]
+    
+    return house_members + senate_members
+
+def find_representatives(members, zip_code, state=None):
+    # Simple lookup by ZIP (limited accuracy; real apps use full address via Google Civic API)
+    reps = []
+    for member in members:
+        if member.get("zip") == zip_code or (state and member["state"] == state):
+            reps.append(member)
+    return reps
+
+def generate_message(member_name, member_role, member_state_district):
+    template = f"""
+Dear {member_role} {member_name},
+
+I am a constituent from {member_state_district} writing to express my concern about unnecessary government spending. As a taxpayer, I kindly ask that you prioritize fiscal responsibility and work to reduce waste in federal budgets.
+
+Please stop wasting my money on inefficient programs and focus on essential services that benefit the American people.
+
+Thank you for your attention to this matter and for your service.
+
+Sincerely,
+[Your Full Name]
+[Your Address]
+[Your City, State, ZIP]
+[Your Email]
+[Your Phone]
+"""
+    return template.strip()
+
+def main():
+    if API_KEY == "YOUR_API_KEY_HERE":
+        print("Error: Please replace 'YOUR_API_KEY_HERE'
